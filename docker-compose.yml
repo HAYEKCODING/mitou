@@ -1,0 +1,44 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-coul_dentaire}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      PORT: 5000
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example}
+      DB_NAME: ${MYSQL_DATABASE:-coul_dentaire}
+      JWT_SECRET: ${JWT_SECRET:-changez_moi}
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./Frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:
