@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: coul-backend
+    env: node
+    plan: starter
+    branch: main
+    root: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        value: REPLACE_ME
+      - key: DB_USER
+        value: REPLACE_ME
+      - key: DB_PASSWORD
+        value: REPLACE_ME
+      - key: DB_NAME
+        value: REPLACE_ME
+      - key: JWT_SECRET
+        value: REPLACE_ME
